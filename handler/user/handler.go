@@ -10,6 +10,7 @@ import (
 
 type Handler struct {
 	UserService user.Service
+	// employeeService employee.Service // Example of another service that could be injected
 }
 
 func NewHandler(userService user.Service) *Handler {
@@ -29,6 +30,10 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	var userInput request.UserInput
 	if err := c.Bind(&userInput); err != nil {
 		return c.JSON(400, map[string]string{"error": "Invalid input"})
+	}
+
+	if len(userInput.Fullname) > 100 {
+		return c.JSON(400, map[string]string{"error": "Fullname exceeds maximum length of 100 characters"})
 	}
 
 	newUser := model.User{
@@ -57,6 +62,7 @@ func (h *Handler) GetAllUsers(c echo.Context) error {
 	var userList []response.User
 	for _, item := range users {
 		userList = append(userList, response.User{
+			ID:       item.ID,
 			Fullname: item.Fullname,
 			Email:    item.Email,
 		})

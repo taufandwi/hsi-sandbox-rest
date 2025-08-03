@@ -25,3 +25,6 @@ HSI sanbox REST API template
    curl http://localhost:55667/ping
    ```
    
+# Latihan pekan ke 5
+## Melanjuatkan CRUD Employee
+   

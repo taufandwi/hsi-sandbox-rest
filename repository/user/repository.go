@@ -22,6 +22,7 @@ func NewRepository(modelUserList *[]model.User) *Repository {
 }
 
 func (r *Repository) CreateUser(u model.User) (err error) {
+	u.ID = int64(len(*r.ModelUserList) + 1) // Simple ID generation logic, can be replaced with a better one
 	*r.ModelUserList = append(*r.ModelUserList, u)
 	return nil
 }
@@ -32,6 +33,7 @@ func (r *Repository) GetAllUsers() (users []model.User, err error) {
 	if r.ModelUserList == nil {
 		return nil, nil
 	}
+
 	return *r.ModelUserList, nil
 }
 

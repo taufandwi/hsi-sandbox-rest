@@ -8,6 +8,7 @@ import (
 	"github.com/taufandwi/hsi-sandbox-rest/handler/health_check"
 	userRepo "github.com/taufandwi/hsi-sandbox-rest/handler/user"
 	"github.com/taufandwi/hsi-sandbox-rest/repository/user"
+	modelEmployee "github.com/taufandwi/hsi-sandbox-rest/service/employee/model"
 	userSrv "github.com/taufandwi/hsi-sandbox-rest/service/user"
 	"github.com/taufandwi/hsi-sandbox-rest/service/user/model"
 	"os"
@@ -20,6 +21,7 @@ func main() {
 	// init awal, orm, cache, etc.
 	// Create a mockup data store for users
 	modelUserList := make([]model.User, 0)
+	_ = make([]modelEmployee.Employee, 0)
 
 	// -------- init repo --------
 	userRepository := user.NewRepository(&modelUserList)
