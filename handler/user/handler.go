@@ -2,6 +2,8 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/taufandwi/hsi-sandbox-rest/handler/user/request"
+	"github.com/taufandwi/hsi-sandbox-rest/handler/user/response"
 	"github.com/taufandwi/hsi-sandbox-rest/service/user"
 	"github.com/taufandwi/hsi-sandbox-rest/service/user/model"
 )
@@ -24,11 +26,7 @@ func (h *Handler) RegisterPath(e *echo.Group) {
 
 // CreateUser creates a new user
 func (h *Handler) CreateUser(c echo.Context) error {
-	var userInput struct {
-		Fullname string `json:"fullname" validate:"required"`
-		Email    string `json:"email" validate:"required,email"`
-	}
-
+	var userInput request.UserInput
 	if err := c.Bind(&userInput); err != nil {
 		return c.JSON(400, map[string]string{"error": "Invalid input"})
 	}
@@ -56,5 +54,13 @@ func (h *Handler) GetAllUsers(c echo.Context) error {
 		return c.JSON(204, nil) // No content
 	}
 
-	return c.JSON(200, users)
+	var userList []response.User
+	for _, item := range users {
+		userList = append(userList, response.User{
+			Fullname: item.Fullname,
+			Email:    item.Email,
+		})
+	}
+
+	return c.JSON(200, userList)
 }

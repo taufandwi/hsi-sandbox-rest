@@ -17,6 +17,7 @@ import (
 
 func main() {
 
+	// init awal, orm, cache, etc.
 	// Create a mockup data store for users
 	modelUserList := make([]model.User, 0)
 
@@ -34,7 +35,7 @@ func main() {
 	e.HideBanner = true
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
-	e.Use(middleware.BodyLimit("100M"))
+	e.Use(middleware.BodyLimit("50M"))
 	e.Use(middleware.Recover())
 
 	// echo group
