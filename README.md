@@ -2,6 +2,13 @@
 HSI sanbox REST API template
 
 # Getting Started
+
+## pre-requisites
+- Go 1.20 or later
+- Insomnia or Postman for testing the API
+    - [Insomnia](https://insomnia.rest/download)
+    - [Postman](https://www.postman.com/downloads/)
+
 ## How to run
 1. Clone the repository
 2. Install dependencies
@@ -18,8 +25,3 @@ HSI sanbox REST API template
    curl http://localhost:55667/ping
    ```
    
-## pre-requisites
-- Go 1.20 or later
-- Insomnia or Postman for testing the API
-  - [Insomnia](https://insomnia.rest/download)
-  - [Postman](https://www.postman.com/downloads/)
