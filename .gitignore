@@ -30,3 +30,6 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+/.idea/hsi_rest.iml
+/.idea/modules.xml
+/.idea/vcs.xml
