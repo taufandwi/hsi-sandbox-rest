@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	employeeHdl "github.com/taufandwi/hsi-sandbox-rest/handler/employee"
 	"github.com/taufandwi/hsi-sandbox-rest/handler/health_check"
-	userRepo "github.com/taufandwi/hsi-sandbox-rest/handler/user"
+	userHdl "github.com/taufandwi/hsi-sandbox-rest/handler/user"
+	"github.com/taufandwi/hsi-sandbox-rest/repository/employee"
 	"github.com/taufandwi/hsi-sandbox-rest/repository/user"
+	employeeSrv "github.com/taufandwi/hsi-sandbox-rest/service/employee"
 	userSrv "github.com/taufandwi/hsi-sandbox-rest/service/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -45,12 +48,15 @@ func main() {
 
 	// -------- init repo --------
 	userRepository := user.NewRepository(db)
+	employeeRepository := employee.NewRepository(db)
 
 	// -------- init service --------
 	userService := userSrv.NewService(userRepository)
+	employeeService := employeeSrv.NewService(employeeRepository)
 
 	// -------- init handler --------
-	userHandler := userRepo.NewHandler(userService)
+	userHandler := userHdl.NewHandler(userService)
+	employeeHandler := employeeHdl.NewHandler(employeeService)
 
 	// -------- api --------
 	e := echo.New()
@@ -66,6 +72,7 @@ func main() {
 	// ----- register routes -----
 	health_check.RegisterPath(eg)
 	userHandler.RegisterPath(eg)
+	employeeHandler.RegisterPath(eg)
 
 	// Start server
 	go func() {

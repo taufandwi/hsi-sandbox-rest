@@ -1,7 +1,5 @@
 package model
 
-import "time"
-
 type Employee struct {
 	ID          int64
 	UserID      int64
@@ -10,6 +8,6 @@ type Employee struct {
 	Email       string
 	PhoneNumber string
 	JobTitle    string
-	HireDate    time.Time
+	HireDate    string
 	Department  string
 }
