@@ -7,7 +7,7 @@ import (
 
 type Service interface {
 	CreateUser(u model.User) (err error)
-	GetAllUsers() (users []model.User, err error)
+	GetAllUser() (users []model.User, err error)
 	UpdateUser(u model.User) (err error)
 }
 
@@ -23,7 +23,7 @@ func (s *service) CreateUser(u model.User) (err error) {
 	return s.userRepo.CreateUser(u)
 }
 
-func (s *service) GetAllUsers() (users []model.User, err error) {
+func (s *service) GetAllUser() (users []model.User, err error) {
 	return s.userRepo.GetAllUsers()
 }
 

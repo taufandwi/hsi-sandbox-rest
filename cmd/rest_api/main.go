@@ -8,9 +8,10 @@ import (
 	"github.com/taufandwi/hsi-sandbox-rest/handler/health_check"
 	userRepo "github.com/taufandwi/hsi-sandbox-rest/handler/user"
 	"github.com/taufandwi/hsi-sandbox-rest/repository/user"
-	modelEmployee "github.com/taufandwi/hsi-sandbox-rest/service/employee/model"
 	userSrv "github.com/taufandwi/hsi-sandbox-rest/service/user"
-	"github.com/taufandwi/hsi-sandbox-rest/service/user/model"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"os"
 	"os/signal"
 	"time"
@@ -18,13 +19,32 @@ import (
 
 func main() {
 
-	// init awal, orm, cache, etc.
-	// Create a mockup data store for users
-	modelUserList := make([]model.User, 0)
-	_ = make([]modelEmployee.Employee, 0)
+	// --------- db ---------
+	var db *gorm.DB
+	// close database connection on exit
+	defer func() {
+		if db != nil {
+			sqlDB, _ := db.DB()
+			sqlDB.Close()
+		}
+	}()
+
+	db, err := gorm.Open(
+		postgres.Open(
+			"host=localhost user=postgres password=postgres dbname=hsi_sandbox port=5433 sslmode=disable TimeZone=Asia/Jakarta",
+		),
+		&gorm.Config{
+			// debug mode
+			Logger: logger.Default.LogMode(logger.Info),
+			//Logger: logger.Default.LogMode(logger.Silent),
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
 
 	// -------- init repo --------
-	userRepository := user.NewRepository(&modelUserList)
+	userRepository := user.NewRepository(db)
 
 	// -------- init service --------
 	userService := userSrv.NewService(userRepository)

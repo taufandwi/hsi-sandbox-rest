@@ -32,25 +32,25 @@ func (h *Handler) CreateUser(c echo.Context) error {
 		return c.JSON(400, map[string]string{"error": "Invalid input"})
 	}
 
-	if len(userInput.Fullname) > 100 {
+	if len(userInput.Username) > 100 {
 		return c.JSON(400, map[string]string{"error": "Fullname exceeds maximum length of 100 characters"})
 	}
 
 	newUser := model.User{
-		Fullname: userInput.Fullname,
-		Email:    userInput.Email,
+		Username: userInput.Username,
+		Password: userInput.Password,
 	}
 
 	if err := h.UserService.CreateUser(newUser); err != nil {
 		return c.JSON(500, map[string]string{"error": "Failed to create user"})
 	}
 
-	return c.JSON(201, newUser)
+	return c.JSON(201, map[string]string{"message": "User created successfully"})
 }
 
 // GetAllUsers retrieves all users
 func (h *Handler) GetAllUsers(c echo.Context) error {
-	users, err := h.UserService.GetAllUsers()
+	users, err := h.UserService.GetAllUser()
 	if err != nil {
 		return c.JSON(500, map[string]string{"error": "Failed to retrieve users"})
 	}
@@ -61,11 +61,7 @@ func (h *Handler) GetAllUsers(c echo.Context) error {
 
 	var userList []response.User
 	for _, item := range users {
-		userList = append(userList, response.User{
-			ID:       item.ID,
-			Fullname: item.Fullname,
-			Email:    item.Email,
-		})
+		userList = append(userList, response.NewUserResponse(item))
 	}
 
 	return c.JSON(200, userList)

@@ -1,48 +1,74 @@
 package user
 
-import "github.com/taufandwi/hsi-sandbox-rest/service/user/model"
+import (
+	"github.com/taufandwi/hsi-sandbox-rest/repository/user/entity"
+	"github.com/taufandwi/hsi-sandbox-rest/service/user/model"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+)
 
 // implementation of the User repository interface
 type Repository struct {
 	// mock for database
-	ModelUserList *[]model.User
+	//ModelUserList *[]model.User
 
 	// orm
-	// DB *gorm.DB, DB *sqlx.DB
+	db *gorm.DB
+	//DB *sqlx.DB
 
 	// other connections
 	// Cache *redis.Client
 	// Mongo *mongo.Client
 }
 
-func NewRepository(modelUserList *[]model.User) *Repository {
+func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
-		ModelUserList: modelUserList,
+		db,
 	}
 }
 
 func (r *Repository) CreateUser(u model.User) (err error) {
-	u.ID = int64(len(*r.ModelUserList) + 1) // Simple ID generation logic, can be replaced with a better one
-	*r.ModelUserList = append(*r.ModelUserList, u)
+	var userEnt entity.User
+
+	// hash password
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return
+	}
+
+	userEnt = entity.User{
+		Username:     u.Username,
+		PasswordHash: string(hashPassword),
+	}
+
+	// save to database
+	if err = r.db.Create(&userEnt).Error; err != nil {
+		return
+	}
+
 	return nil
 }
 
 func (r *Repository) GetAllUsers() (users []model.User, err error) {
-	// gorm.find(&users)
-	// sqlx.Select(&users, "SELECT * FROM users")
-	if r.ModelUserList == nil {
-		return nil, nil
+	var userEnts []entity.User
+
+	if err = r.db.Order("id desc").Find(&userEnts).Error; err != nil {
+		return
 	}
 
-	return *r.ModelUserList, nil
+	for _, item := range userEnts {
+		users = append(users, item.ToModel())
+	}
+
+	return
 }
 
 func (r *Repository) UpdateUser(u model.User) (err error) {
-	for i, user := range *r.ModelUserList {
-		if user.ID == u.ID {
-			(*r.ModelUserList)[i] = u
-			return nil
-		}
-	}
+	//for i, user := range *r.ModelUserList {
+	//	if user.ID == u.ID {
+	//		(*r.ModelUserList)[i] = u
+	//		return nil
+	//	}
+	//}
 	return nil // or return an error if user not found
 }
