@@ -19,10 +19,10 @@ func NewHandler(employeeService employee.Service) *Handler {
 }
 
 // RegisterPath registers the employee-related routes
-func (h *Handler) RegisterPath(e *echo.Group, middlewareJWt ...echo.MiddlewareFunc) {
-	e.POST("/employee/create", h.createEmployee)
-	e.GET("/employee/get-all", h.getAllEmployees)
-	e.PUT("/employee/update", h.updateEmployee)
+func (h *Handler) RegisterPath(e *echo.Group, middlewareJWT ...echo.MiddlewareFunc) {
+	e.POST("/employee/create", h.createEmployee, middlewareJWT...)
+	e.GET("/employee/get-all", h.getAllEmployees, middlewareJWT...)
+	e.PUT("/employee/update", h.updateEmployee, middlewareJWT...)
 }
 
 // createEmployee creates a new employee

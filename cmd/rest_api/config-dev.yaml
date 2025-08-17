@@ -17,4 +17,4 @@ logger:
   rotation_time: 1 # in day --> split file per x day
 
 jwt:
-  jwt_key: "secret"
+  jwt_key: "secret909090"

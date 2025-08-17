@@ -114,7 +114,7 @@ func main() {
 	employeeService := employeeSrv.NewService(employeeRepository)
 
 	// -------- init handler --------
-	userHandler := userHdl.NewHandler(userService)
+	userHandler := userHdl.NewHandler(userService, config.JWT.JwtKey)
 	employeeHandler := employeeHdl.NewHandler(employeeService)
 
 	// -------- api --------
@@ -125,12 +125,12 @@ func main() {
 	e.Use(middleware.BodyLimit("50M"))
 	e.Use(middleware.Recover())
 
-	// -------- config JWT -----------
+	// -------- config echo middleware for JWT -----------
 	configJWT := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(jwtCustomClaims)
 		},
-		SigningKey:    []byte("secret"),
+		SigningKey:    []byte(config.JWT.JwtKey),
 		SigningMethod: "HS256",
 		ErrorHandler: func(c echo.Context, err error) error {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "please check your token"})

@@ -12,13 +12,15 @@ import (
 )
 
 type Handler struct {
-	UserService user.Service
+	UserService  user.Service
+	JwtSecretKey string
 	// employeeService employee.Service // Example of another service that could be injected
 }
 
-func NewHandler(userService user.Service) *Handler {
+func NewHandler(userService user.Service, JwtSecretKey string) *Handler {
 	return &Handler{
-		UserService: userService,
+		UserService:  userService,
+		JwtSecretKey: JwtSecretKey,
 	}
 }
 
@@ -100,7 +102,7 @@ func (h *Handler) LoginAndGenerateJWTToken(c echo.Context) error {
 	tokenTemp := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Generate encoded token and send it as response.
-	token, err := tokenTemp.SignedString([]byte("secret"))
+	token, err := tokenTemp.SignedString([]byte(h.JwtSecretKey))
 	if err != nil {
 		return err
 	}
