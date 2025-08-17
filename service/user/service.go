@@ -7,9 +7,9 @@ import (
 )
 
 type Service interface {
-	CreateUser(u model.User) (err error)
-	GetAllUser() (users []model.User, err error)
-	UpdateUser(u model.User) (err error)
+	CreateUser(ctx context.Context, u model.User) (err error)
+	GetAllUser(ctx context.Context) (users []model.User, err error)
+	UpdateUser(ctx context.Context, u model.User) (err error)
 	GetUserByUserName(ctx context.Context, username string) (user model.User, err error)
 }
 
@@ -21,16 +21,16 @@ func NewService(userRepo repository.User) Service {
 	return &service{userRepo}
 }
 
-func (s *service) CreateUser(u model.User) (err error) {
-	return s.userRepo.CreateUser(u)
+func (s *service) CreateUser(ctx context.Context, u model.User) (err error) {
+	return s.userRepo.CreateUser(ctx, u)
 }
 
-func (s *service) GetAllUser() (users []model.User, err error) {
-	return s.userRepo.GetAllUsers()
+func (s *service) GetAllUser(ctx context.Context) (users []model.User, err error) {
+	return s.userRepo.GetAllUsers(ctx)
 }
 
-func (s *service) UpdateUser(u model.User) (err error) {
-	return s.userRepo.UpdateUser(u)
+func (s *service) UpdateUser(ctx context.Context, u model.User) (err error) {
+	return s.userRepo.UpdateUser(ctx, u)
 }
 
 func (s *service) GetUserByUserName(ctx context.Context, username string) (user model.User, err error) {

@@ -28,7 +28,7 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-func (r *Repository) CreateUser(u model.User) (err error) {
+func (r *Repository) CreateUser(ctx context.Context, u model.User) (err error) {
 	var userEnt entity.User
 
 	// hash password
@@ -43,17 +43,17 @@ func (r *Repository) CreateUser(u model.User) (err error) {
 	}
 
 	// save to database
-	if err = r.db.Create(&userEnt).Error; err != nil {
+	if err = r.db.WithContext(ctx).Create(&userEnt).Error; err != nil {
 		return
 	}
 
 	return nil
 }
 
-func (r *Repository) GetAllUsers() (users []model.User, err error) {
+func (r *Repository) GetAllUsers(ctx context.Context) (users []model.User, err error) {
 	var userEnts []entity.User
 
-	if err = r.db.Order("id desc").Find(&userEnts).Error; err != nil {
+	if err = r.db.WithContext(ctx).Order("id desc").Find(&userEnts).Error; err != nil {
 		return
 	}
 
@@ -64,7 +64,7 @@ func (r *Repository) GetAllUsers() (users []model.User, err error) {
 	return
 }
 
-func (r *Repository) UpdateUser(u model.User) (err error) {
+func (r *Repository) UpdateUser(ctx context.Context, u model.User) (err error) {
 	//for i, user := range *r.ModelUserList {
 	//	if user.ID == u.ID {
 	//		(*r.ModelUserList)[i] = u

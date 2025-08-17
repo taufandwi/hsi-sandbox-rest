@@ -45,7 +45,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 		Password: userInput.Password,
 	}
 
-	if err := h.UserService.CreateUser(newUser); err != nil {
+	if err := h.UserService.CreateUser(c.Request().Context(), newUser); err != nil {
 		return c.JSON(500, map[string]string{"error": "Failed to create user"})
 	}
 
@@ -54,7 +54,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 
 // GetAllUsers retrieves all users
 func (h *Handler) GetAllUsers(c echo.Context) error {
-	users, err := h.UserService.GetAllUser()
+	users, err := h.UserService.GetAllUser(c.Request().Context())
 	if err != nil {
 		return c.JSON(500, map[string]string{"error": "Failed to retrieve users"})
 	}

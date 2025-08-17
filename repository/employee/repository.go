@@ -19,7 +19,7 @@ func NewRepository(db *gorm.DB) *Repository {
 }
 
 func (r *Repository) CreateEmployee(ctx context.Context, e model.Employee) (err error) {
-	tx := r.db.Begin()
+	tx := r.db.WithContext(ctx).Begin()
 	if tx.Error != nil {
 		tx.Rollback()
 		return tx.Error
@@ -74,7 +74,7 @@ func (r *Repository) GetAllEmployees(ctx context.Context) (employees []model.Emp
 func (r *Repository) UpdateEmployee(ctx context.Context, id int64, e model.Employee) (err error) {
 	employeeEnt := entity.NewEmployeeEntity(e)
 
-	if err = r.db.Omit("id", "user_id", "email", "phone_number", "hire_date", "department").Where("id = ?", id).Updates(&employeeEnt).Error; err != nil {
+	if err = r.db.WithContext(ctx).Omit("id", "user_id", "email", "phone_number", "hire_date", "department").Where("id = ?", id).Updates(&employeeEnt).Error; err != nil {
 		return
 	}
 

@@ -6,8 +6,8 @@ import (
 )
 
 type User interface {
-	CreateUser(u model.User) (err error)
-	GetAllUsers() (users []model.User, err error)
-	UpdateUser(u model.User) (err error)
+	CreateUser(ctx context.Context, u model.User) (err error)
+	GetAllUsers(ctx context.Context) (users []model.User, err error)
+	UpdateUser(ctx context.Context, u model.User) (err error)
 	GetUserByUserName(ctx context.Context, username string) (user model.User, err error)
 }

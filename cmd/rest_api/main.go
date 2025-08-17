@@ -16,9 +16,13 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v4"
 )
 
 type Config struct {
@@ -35,11 +39,20 @@ type Config struct {
 		SSLMode  string `mapstructure:"sslmode"`
 		PoolSize uint64 `mapstructure:"pool_size"`
 	} `mapstructure:"database"`
+	JWT struct {
+		JwtKey string `mapstructure:"jwt_key"`
+	} `mapstructure:"jwt"`
 	Logger struct {
 		Path         string `validate:"required" mapstructure:"path"`
 		MaxAge       int    `validate:"required,gte=1,lte=365" mapstructure:"max_age"`
 		RotationTime int    `validate:"required,gte=1,lte=365" mapstructure:"rotation_time"`
 	} `mapstructure:"logger"`
+}
+
+type jwtCustomClaims struct {
+	Username string `json:"name"`
+	UserID   uint64 `json:"user_id"`
+	jwt.RegisteredClaims
 }
 
 func main() {
@@ -112,13 +125,25 @@ func main() {
 	e.Use(middleware.BodyLimit("50M"))
 	e.Use(middleware.Recover())
 
+	// -------- config JWT -----------
+	configJWT := echojwt.Config{
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(jwtCustomClaims)
+		},
+		SigningKey:    []byte("secret"),
+		SigningMethod: "HS256",
+		ErrorHandler: func(c echo.Context, err error) error {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "please check your token"})
+		},
+	}
+
 	// echo group
 	eg := e.Group("/api/v1")
 
 	// ----- register routes -----
 	health_check.RegisterPath(eg)
 	userHandler.RegisterPath(eg)
-	employeeHandler.RegisterPath(eg)
+	employeeHandler.RegisterPath(eg, echojwt.WithConfig(configJWT))
 
 	// Start server
 	go func() {
