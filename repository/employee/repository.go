@@ -1,6 +1,7 @@
 package employee
 
 import (
+	"context"
 	"github.com/taufandwi/hsi-sandbox-rest/repository/employee/entity"
 	"github.com/taufandwi/hsi-sandbox-rest/service/employee/model"
 	"golang.org/x/crypto/bcrypt"
@@ -17,7 +18,7 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-func (r *Repository) CreateEmployee(e model.Employee) (err error) {
+func (r *Repository) CreateEmployee(ctx context.Context, e model.Employee) (err error) {
 	tx := r.db.Begin()
 	if tx.Error != nil {
 		tx.Rollback()
@@ -56,10 +57,10 @@ func (r *Repository) CreateEmployee(e model.Employee) (err error) {
 	return
 }
 
-func (r *Repository) GetAllEmployees() (employees []model.Employee, err error) {
+func (r *Repository) GetAllEmployees(ctx context.Context) (employees []model.Employee, err error) {
 	var employeeEnts []entity.Employee
 
-	if err = r.db.Find(&employeeEnts).Error; err != nil {
+	if err = r.db.WithContext(ctx).Find(&employeeEnts).Error; err != nil {
 		return
 	}
 
@@ -70,7 +71,7 @@ func (r *Repository) GetAllEmployees() (employees []model.Employee, err error) {
 	return
 }
 
-func (r *Repository) UpdateEmployee(id int64, e model.Employee) (err error) {
+func (r *Repository) UpdateEmployee(ctx context.Context, id int64, e model.Employee) (err error) {
 	employeeEnt := entity.NewEmployeeEntity(e)
 
 	if err = r.db.Omit("id", "user_id", "email", "phone_number", "hire_date", "department").Where("id = ?", id).Updates(&employeeEnt).Error; err != nil {

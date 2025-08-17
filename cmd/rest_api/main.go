@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/spf13/viper"
 	employeeHdl "github.com/taufandwi/hsi-sandbox-rest/handler/employee"
 	"github.com/taufandwi/hsi-sandbox-rest/handler/health_check"
 	userHdl "github.com/taufandwi/hsi-sandbox-rest/handler/user"
@@ -20,7 +21,44 @@ import (
 	"time"
 )
 
+type Config struct {
+	Server struct {
+		Rest string `validate:"required" mapstructure:"rest"`
+	} `mapstructure:"server"`
+	DB struct {
+		Driver   string `validate:"required" mapstructure:"driver"`
+		Host     string `validate:"required" mapstructure:"host"`
+		Port     int    `validate:"required" mapstructure:"port"`
+		Username string `mapstructure:"username"`
+		Password string `mapstructure:"password"`
+		DbName   string `validate:"required" mapstructure:"dbname"`
+		SSLMode  string `mapstructure:"sslmode"`
+		PoolSize uint64 `mapstructure:"pool_size"`
+	} `mapstructure:"database"`
+	Logger struct {
+		Path         string `validate:"required" mapstructure:"path"`
+		MaxAge       int    `validate:"required,gte=1,lte=365" mapstructure:"max_age"`
+		RotationTime int    `validate:"required,gte=1,lte=365" mapstructure:"rotation_time"`
+	} `mapstructure:"logger"`
+}
+
 func main() {
+	//	------------ config ------------
+	viper.SetConfigName("config-dev")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("config")
+	viper.AddConfigPath(".")
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic("Error reading config file: " + err.Error())
+	}
+
+	var config Config
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		panic("Unable to decode into struct: " + err.Error())
+	}
 
 	// --------- db ---------
 	var db *gorm.DB
@@ -32,9 +70,17 @@ func main() {
 		}
 	}()
 
-	db, err := gorm.Open(
+	db, err = gorm.Open(
 		postgres.Open(
-			"host=localhost user=postgres password=postgres dbname=hsi_sandbox port=5433 sslmode=disable TimeZone=Asia/Jakarta",
+			fmt.Sprintf(
+				"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s search_path=public TimeZone=Asia/Jakarta",
+				config.DB.Host,
+				config.DB.Username,
+				config.DB.Password,
+				config.DB.DbName,
+				config.DB.Port,
+				config.DB.SSLMode,
+			),
 		),
 		&gorm.Config{
 			// debug mode
@@ -76,7 +122,7 @@ func main() {
 
 	// Start server
 	go func() {
-		if err := e.Start(":55667"); err != nil {
+		if err := e.Start(config.Server.Rest); err != nil {
 			e.Logger.Fatal("Shutting down the server")
 		}
 	}()

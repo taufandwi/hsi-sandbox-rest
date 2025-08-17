@@ -12,5 +12,6 @@ func (u User) ToModel() model.User {
 	return model.User{
 		ID:       u.ID,
 		Username: u.Username,
+		Password: u.PasswordHash,
 	}
 }

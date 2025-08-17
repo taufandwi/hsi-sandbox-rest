@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"github.com/taufandwi/hsi-sandbox-rest/repository/user/entity"
 	"github.com/taufandwi/hsi-sandbox-rest/service/user/model"
 	"golang.org/x/crypto/bcrypt"
@@ -71,4 +72,16 @@ func (r *Repository) UpdateUser(u model.User) (err error) {
 	//	}
 	//}
 	return nil // or return an error if user not found
+}
+
+func (r *Repository) GetUserByUserName(ctx context.Context, username string) (user model.User, err error) {
+	var userEnt entity.User
+
+	if err = r.db.WithContext(ctx).Where("username = ?", username).First(&userEnt).Error; err != nil {
+		return
+	}
+
+	user = userEnt.ToModel()
+
+	return
 }

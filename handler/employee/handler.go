@@ -33,7 +33,7 @@ func (h *Handler) createEmployee(c echo.Context) error {
 		return c.JSON(400, map[string]string{"error": "Invalid input"})
 	}
 
-	if err := h.EmployeeService.CreateEmployee(employeeReq.ToModel()); err != nil {
+	if err := h.EmployeeService.CreateEmployee(c.Request().Context(), employeeReq.ToModel()); err != nil {
 		return c.JSON(500, map[string]string{"error": "Failed to create employee"})
 	}
 
@@ -42,7 +42,7 @@ func (h *Handler) createEmployee(c echo.Context) error {
 
 // getAllEmployees retrieves all employees
 func (h *Handler) getAllEmployees(c echo.Context) error {
-	employees, err := h.EmployeeService.GetAllEmployees()
+	employees, err := h.EmployeeService.GetAllEmployees(c.Request().Context())
 	if err != nil {
 		return c.JSON(500, map[string]string{"error": "Failed to retrieve employees"})
 	}
@@ -78,7 +78,7 @@ func (h *Handler) updateEmployee(c echo.Context) error {
 		return c.JSON(400, map[string]string{"error": "Invalid employee ID"})
 	}
 
-	if err := h.EmployeeService.UpdateEmployee(id, employeeReq.ToModel()); err != nil {
+	if err := h.EmployeeService.UpdateEmployee(c.Request().Context(), id, employeeReq.ToModel()); err != nil {
 		return c.JSON(500, map[string]string{"error": "Failed to update employee"})
 	}
 

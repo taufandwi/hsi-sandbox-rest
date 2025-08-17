@@ -1,0 +1,17 @@
+server:
+  rest: ":55667"
+
+database:
+  driver: "postgresql"
+  host: "localhost"
+  port: 5433 # 5432
+  username: "postgres"
+  password: "postgres"
+  dbname: "hsi_sandbox"
+  sslmode: "disable"
+  pool_size: 100
+
+logger:
+  path: "logs/sales_reporting.log"
+  max_age: 7 # in day --> delete if older than x day
+  rotation_time: 1 # in day --> split file per x day
